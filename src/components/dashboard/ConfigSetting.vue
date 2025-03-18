@@ -182,7 +182,7 @@ const handleChangeArea = async () => {
   })
 
   wsStore.changeArea(dashboardStore.modalData.data.area, formState.value.area)
-
+  handleReset()
   dashboardStore.modalVisible = false
   dashboardStore.reload = true
 }
@@ -192,7 +192,7 @@ const handleChangeGroup = async () => {
     oldArea: dashboardStore.modalData.data.area,
     group_id: formState.value.group_id,
   })
-
+  handleReset()
   dashboardStore.modalVisible = false
   dashboardStore.reload = true
 }
