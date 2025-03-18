@@ -1,5 +1,13 @@
 <template>
   <div>
+    <a-result v-if="wsStore.data.length === 0" class="no-device">
+      <template #title>
+        <span>No device online</span>
+      </template>
+      <template #subTitle>
+        <span>Try to refresh periodically to see changes in connection to the server</span>
+      </template>
+    </a-result>
     <a-row :gutter="[16, 16]">
       <BaseCardColumn
         :xs="24"
@@ -11,7 +19,6 @@
         v-for="device in wsStore.data"
         :key="device.area"
         :hoverable="true"
-        class="device-card"
       >
         <template #body>
           <a-spin :spinning="device.disconnected">
@@ -25,7 +32,7 @@
               <a-space direction="vertical" :size="1">
                 <span class="area">{{ formatArea(device.area) }}</span>
                 <a-tag :color="device.group_name ? '#3D8D7A' : '#AC1754'" class="bold">
-                  {{ device.group_name || 'Not Grouped' }}</a-tag
+                  {{ device.group_name || 'Ungrouped' }}</a-tag
                 >
               </a-space>
               <a-flex vertical class="last-updated">
@@ -36,7 +43,7 @@
             <a-flex justify="space-around" align="center" wrap="wrap">
               <a-flex vertical align="center" class="wrapper-data">
                 <span>Temperature </span>
-                <transition name="fade" mode="out-in">
+                <transition name="zoom" mode="out-in">
                   <span
                     class="area"
                     :class="{
@@ -85,7 +92,7 @@
               </a-flex>
               <a-flex vertical align="center" class="wrapper-data">
                 <span>Humidity </span>
-                <transition name="fade" mode="out-in">
+                <transition name="zoom" mode="out-in">
                   <span
                     class="area"
                     :key="getWsData(device.area, 'sensor.humi')"
@@ -229,14 +236,6 @@ const formatArea = (str) => {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize setiap kata
     .join(' ')
 }
-// Trigger when data is not updated for 2 seconds
-// const checkTimeDifference = (lastUpdated) => {
-//   const last = dayjs(lastUpdated, 'YYYY-MM-DD HH:mm:ss')
-//   const now = dayjs()
-//   const diff = Math.abs(now.diff(last, 'second')) > 2
-//   // console.log(diff)
-//   return diff
-// }
 
 onMounted(async () => {
   wsStore.initializeWsData()
@@ -260,6 +259,10 @@ watch(
 </script>
 
 <style scoped>
+.no-device {
+  padding-top: 15%;
+}
+
 .area {
   font-size: x-large;
   font-weight: bold;
@@ -281,12 +284,18 @@ watch(
   padding: 0.5rem;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease-in-out;
+.zoom-enter-active,
+.zoom-leave-active {
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
-.fade-enter-from,
-.fade-leave-to {
+.zoom-enter-from {
+  transform: scale(0);
+  opacity: 0;
+}
+.zoom-leave-to {
+  transform: scale(0);
   opacity: 0;
 }
 
