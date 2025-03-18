@@ -2,7 +2,7 @@
   <BaseCardColumn :xs="24" :sm="24" :md="24" :lg="4" :xl="4" size="small">
     <template #body>
       <div class="filter-report">
-        <a-flex vertical>
+        <a-flex vertical style="margin-bottom: 16px">
           <span class="title">RDZ-TH Report</span>
           <a-form :model="reportStore" layout="vertical">
             <a-form-item>
@@ -27,6 +27,16 @@
               />
             </a-form-item>
           </a-form>
+          <a-space direction="vertical" :size="0" v-if="reportStore.area !== 'All'">
+            <span class="bold">Device Status</span>
+            <a-tag
+              class="bold"
+              :color="deviceStore.getStatusByArea(reportStore.area) == 1 ? '#3D8D7A' : '#AC1754'"
+              >{{
+                deviceStore.getStatusByArea(reportStore.area) == 1 ? 'Enabled' : 'Disabled'
+              }}</a-tag
+            >
+          </a-space>
         </a-flex>
         <a-flex justify="flex-end" style="margin-bottom: 16px">
           <a-popconfirm
@@ -56,8 +66,12 @@
                   <span>Warning sensor value</span>
                 </a-flex>
                 <a-flex justify="space-between" align="center" wrap="wrap">
-                  <div class="rectangle-error" />
-                  <span>Alarm sensor value</span>
+                  <div class="rectangle-error-min" />
+                  <span>Sensor exceeds min range</span>
+                </a-flex>
+                <a-flex justify="space-between" align="center" wrap="wrap">
+                  <div class="rectangle-error-max" />
+                  <span>Sensor exceeds max range</span>
                 </a-flex>
               </a-collapse-panel>
             </a-collapse>
@@ -118,10 +132,17 @@ onMounted(() => {
 .rectangle-warning {
   width: 25px;
   height: 10px;
-  background-color: #fdff99;
+  background-color: #ffa725;
   border: 1px solid gray;
 }
-.rectangle-error {
+.rectangle-error-min {
+  width: 25px;
+  height: 10px;
+  background-color: #4f959d;
+  border: 1px solid gray;
+}
+
+.rectangle-error-max {
   width: 25px;
   height: 10px;
   background-color: #fb9a98;

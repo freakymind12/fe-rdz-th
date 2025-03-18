@@ -5,8 +5,16 @@
       :columns="columns"
       :data-source="data"
       bordered
-      :pagination="false"
-      :scroll="{ x: 'calc(700px + 50%)', y: 510 }"
+      :pagination="{
+        pageSizeOptions: ['20', '50', '100'],
+        current: reportStore.pagination.current,
+        pageSize: reportStore.pagination.pageSize,
+        total: reportStore.pagination.total,
+        showSizeChanger: true,
+        onChange: reportStore.setPage,
+        onShowSizeChange: (current, size) => reportStore.setPageSize(size),
+      }"
+      :scroll="{ x: 'max-content', y: 550 }"
       size="small"
     >
       <template #bodyCell="{ column, record }">
@@ -14,69 +22,46 @@
           <a-tag class="bold" color="#AC1754" v-if="!record.group_name">Ungrouped</a-tag>
           <a-tag color="#3D8D7A" class="bold" v-else>{{ record.group_name }}</a-tag>
         </template>
-        <template v-if="column.key === 'temp_00'">
-          <span
-            :class="{ 'no-data': record.temp_00 === null, 'no-control': record.temp_00 == 'N/C' }"
-          >
-            {{ record.temp_00 ?? 'N/A' }}
+        <template v-if="['temp_00', 'temp_06', 'temp_12', 'temp_18'].includes(column.key)">
+          <span :class="getClass(record[column.key], record.t_min, record.t_max)">
+            {{ record[column.key] ?? 'N/A' }}
           </span>
         </template>
-        <template v-if="column.key === 'temp_06'">
-          <span
-            :class="{ 'no-data': record.temp_06 === null, 'no-control': record.temp_06 == 'N/C' }"
-          >
-            {{ record.temp_06 ?? 'N/A' }}
-          </span>
-        </template>
-        <template v-if="column.key === 'temp_12'">
-          <span
-            :class="{ 'no-data': record.temp_12 === null, 'no-control': record.temp_12 == 'N/C' }"
-          >
-            {{ record.temp_12 ?? 'N/A' }}
-          </span>
-        </template>
-        <template v-if="column.key === 'temp_18'">
-          <span
-            :class="{ 'no-data': record.temp_18 === null, 'no-control': record.temp_18 == 'N/C' }"
-          >
-            {{ record.temp_18 ?? 'N/A' }}
-          </span>
-        </template>
-        <template v-if="column.key === 'humi_00'">
-          <span
-            :class="{ 'no-data': record.humi_00 === null, 'no-control': record.humi_00 == 'N/C' }"
-          >
-            {{ record.humi_00 ?? 'N/A' }}
-          </span>
-        </template>
-        <template v-if="column.key === 'humi_06'">
-          <span
-            :class="{ 'no-data': record.humi_06 === null, 'no-control': record.humi_06 == 'N/C' }"
-          >
-            {{ record.humi_06 ?? 'N/A' }}
-          </span>
-        </template>
-        <template v-if="column.key === 'humi_12'">
-          <span
-            :class="{ 'no-data': record.humi_12 === null, 'no-control': record.humi_12 == 'N/C' }"
-          >
-            {{ record.humi_12 ?? 'N/A' }}
-          </span>
-        </template>
-        <template v-if="column.key === 'humi_18'">
-          <span
-            :class="{ 'no-data': record.humi_18 === null, 'no-control': record.humi_18 == 'N/C' }"
-          >
-            {{ record.humi_18 ?? 'N/A' }}
+        <template v-if="['humi_00', 'humi_06', 'humi_12', 'humi_18'].includes(column.key)">
+          <span :class="getClass(record[column.key], record.t_min, record.t_max)">
+            {{ record[column.key] ?? 'N/A' }}
           </span>
         </template>
       </template>
-      <template #footer> <span class="bold">Total </span> : {{ data.length }} Rows</template>
+      <template #footer>
+        <span class="bold">Total Data </span> : {{ reportStore.reports.total }} Rows</template
+      >
+      <template #emptyText>
+        <a-empty>
+          <template #description>
+            <span class="bold">There is no data for this search filter</span>
+          </template>
+        </a-empty>
+      </template>
     </a-table>
   </div>
 </template>
 
 <script setup>
+import { useReportStore } from '@/stores/report'
+const reportStore = useReportStore()
+
+const getClass = (value, min, max) => {
+  if (value === null) return { 'no-data': true } // Hindari class lain
+  if (value == 'N/C') return { 'no-control': true } // Hindari class lain
+
+  return {
+    warning: value <= min * 1.1 || value >= max * 0.9,
+    'error-max': value >= max,
+    'error-min': value <= min,
+  }
+}
+
 defineProps({
   columns: {
     type: Array,
@@ -85,8 +70,6 @@ defineProps({
         title: 'Date',
         dataIndex: 'report_date',
         key: 'report_date',
-        width: 100,
-        fixed: 'left',
         align: 'center',
         sorter: (a, b) => new Date(a.report_date) - new Date(b.report_date),
       },
@@ -94,8 +77,6 @@ defineProps({
         title: 'Area',
         dataIndex: 'area',
         key: 'area',
-        width: 150,
-        fixed: 'left',
         align: 'center',
         sorter: (a, b) => a.area.localeCompare(b.area),
       },
@@ -103,8 +84,6 @@ defineProps({
         title: 'Group',
         dataIndex: 'group_name',
         key: 'group_name',
-        width: 150,
-        fixed: 'left',
         align: 'center',
         sorter: (a, b) => a.group_name.localeCompare(b.group_name),
       },
@@ -261,7 +240,17 @@ defineProps({
 }
 
 .warning {
-  color: #06bf3a;
+  color: #ffa725;
+  font-weight: bold;
+}
+
+.error-max {
+  color: #fb9a98;
+  font-weight: bold;
+}
+
+.error-min {
+  color: #4f959d;
   font-weight: bold;
 }
 

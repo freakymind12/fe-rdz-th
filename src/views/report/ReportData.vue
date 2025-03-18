@@ -10,7 +10,7 @@
         </div>
 
         <!-- Table hanya muncul saat tidak loading -->
-        <ReportTable v-else :data="reportStore.reports" />
+        <ReportTable v-else :data="reportStore.reports.data" />
       </template>
     </BaseCardColumn>
   </a-row>
@@ -35,9 +35,9 @@ const handleSearch = async () => {
   loading.value = false
 }
 
-onMounted(() => {
-  deviceStore.getDevice()
-  reportStore.getReport()
+onMounted(async () => {
+  await deviceStore.getDevice()
+  await reportStore.getReport()
 })
 
 watch(

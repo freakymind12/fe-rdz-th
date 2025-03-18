@@ -84,6 +84,11 @@ export const useDeviceStore = defineStore('device', {
         console.error(error)
       }
     },
+
+    getStatusByArea(area) {
+      const device = this.devices.find((device) => device.area === area)
+      return device ? device.status : 0
+    },
   },
   getters: {
     deviceOptions: (state) => {
@@ -96,8 +101,8 @@ export const useDeviceStore = defineStore('device', {
           }
 
           acc[groupName].options.push({
-            label: device.area,
             value: device.area,
+            label: `${device.area}`,
           })
 
           return acc

@@ -1,14 +1,18 @@
 import { defineStore } from 'pinia'
 import api from '@/axios/interceptor'
 import dayjs from 'dayjs'
-import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 
 export const useReportStore = defineStore('report', {
   state: () => ({
     reports: [],
-    yearmonth: ref(dayjs()),
-    area: ref('All'),
+    yearmonth: dayjs(),
+    area: 'All',
+    pagination: {
+      current: 1,
+      pageSize: 20,
+      total: 0,
+    },
   }),
   actions: {
     async getReport() {
@@ -17,11 +21,14 @@ export const useReportStore = defineStore('report', {
           year: this.yearmonth.year(),
           month: this.yearmonth.month() + 1,
           area: this.area,
+          page: this.pagination.current, // Mengirim nomor halaman ke backend
+          pageSize: this.pagination.pageSize, // Mengirim jumlah item per halaman
         })
 
         const response = await api.get(`/report?${params.toString()}`)
         if (response.status === 200) {
           this.reports = response.data.data
+          this.pagination.total = response.data.data.total
         }
       } catch (error) {
         console.error('Error fetching reports:', error)
@@ -63,6 +70,20 @@ export const useReportStore = defineStore('report', {
           console.error('Error downloading report:', error)
         }
       }
+    },
+
+    setPage(page) {
+      if (this.pagination.current !== page) {
+        this.pagination.current = page
+        this.getReport()
+      }
+    },
+
+    // Fungsi untuk mengubah jumlah data per halaman
+    setPageSize(size) {
+      this.pagination.pageSize = size
+      this.pagination.current = 1
+      this.getReport()
     },
   },
 })
