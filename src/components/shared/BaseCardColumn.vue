@@ -52,6 +52,15 @@ defineProps({
 }
 
 .bordered {
-  border: 2px solid rgb(166, 174, 191);
+  border: 2px solid rgba(32, 87, 129, 0.8);
+  transition:
+    border-color 0.5s ease,
+    transform 0.5s ease;
+}
+
+.bordered:hover {
+  border-color: rgba(32, 87, 129, 1);
+  transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0.95); /* Membesarkan ukuran */
+  z-index: 1000;
 }
 </style>
