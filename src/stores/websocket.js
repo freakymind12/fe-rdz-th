@@ -7,7 +7,7 @@ const deviceStore = useDeviceStore()
 export const useWebSocketStore = defineStore('websocketRdzTh', {
   state: () => ({
     socket: null,
-    data: JSON.parse(localStorage.getItem('data')) || [],
+    data: JSON.parse(localStorage.getItem('deviceActive')) || [],
     isConnected: false,
   }),
 
@@ -84,7 +84,7 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
     },
 
     saveDataToLocalStorage() {
-      localStorage.setItem('data', JSON.stringify(this.data))
+      localStorage.setItem('deviceActive', JSON.stringify(this.data))
     },
 
     // initial declare ws data
@@ -94,7 +94,7 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
       this.data = deviceStore.devices.map((device) => ({
         area: device.area,
         regional: device.regional,
-        date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+        date: dayjs(device.updated_at).format('YYYY-MM-DD HH:mm:ss'),
         group_id: device.group_id,
         group_name: device.group_name,
         status: device.status,
@@ -116,12 +116,12 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
         },
         error: {
           temperature: {
-            isError: true,
-            reason: 'waiting initial',
+            isError: false,
+            reason: '',
           },
           humidity: {
-            isError: true,
-            reason: 'waiting initial',
+            isError: false,
+            reason: '',
           },
         },
       }))
@@ -139,7 +139,7 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
             const diffInSeconds = now.diff(dayjs(device.date, 'YYYY-MM-DD HH:mm:ss'), 'second')
             device.disconnected = diffInSeconds >= 90
             console.log(diffInSeconds)
-            if (diffInSeconds >= 100) {
+            if (diffInSeconds >= 720) {
               this.initializeWsData()
             }
           }
