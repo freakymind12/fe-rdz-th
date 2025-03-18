@@ -10,7 +10,7 @@
         <MasterTable
           :columns="columns"
           :data="deviceStore.devices"
-          :scroll-x="300"
+          :scroll-x="800"
           :scroll-y="580"
           v-else
         >
