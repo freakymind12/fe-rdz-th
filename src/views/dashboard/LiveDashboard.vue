@@ -238,7 +238,9 @@ const formatArea = (str) => {
 }
 
 onMounted(async () => {
-  wsStore.initializeWsData()
+  if ((wsStore.data.length === 0)) {
+    wsStore.initializeWsData()
+  }
   wsStore.connect('ws://192.168.148.125:5002/rdz-th')
 })
 

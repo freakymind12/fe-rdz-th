@@ -137,9 +137,9 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
         this.data.forEach((device) => {
           if (device.date) {
             const diffInSeconds = now.diff(dayjs(device.date, 'YYYY-MM-DD HH:mm:ss'), 'second')
-            device.disconnected = diffInSeconds >= 90
+            device.disconnected = diffInSeconds >= import.meta.env.VITE_DEVICE_DISCONNECT_INTERVAL
             console.log(diffInSeconds)
-            if (diffInSeconds >= 720) {
+            if (diffInSeconds >= import.meta.env.VITE_DASHBOARD_REINITIAL_INTERVAL) {
               this.initializeWsData()
             }
           }
