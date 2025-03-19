@@ -1,12 +1,12 @@
 <template>
   <div>
-    <iframe src="http://192.168.148.125:5173" class="embed"></iframe>
+    <iframe :src="embedURL" class="embed"></iframe>
   </div>
 </template>
 
-<scipt setup>
-
-</scipt>
+<script setup>
+const embedURL = import.meta.env.VITE_HEATMAP_DASHBOARD_URL
+</script>
 
 <style scoped>
 .embed {
