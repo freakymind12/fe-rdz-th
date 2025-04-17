@@ -1,6 +1,24 @@
 <template>
   <div>
-    <a-result v-if="wsStore.data.length === 0" class="no-device">
+    <a-flex
+      justify="space-between"
+      align="center"
+      style="margin-bottom: 1rem"
+      wrap="wrap"
+      gap="small"
+    >
+      <span class="bold x-large">Temperature & Humidity Monitor</span>
+      <a-space :size="0" direction="vertical">
+        <span class="bold">Select Group Monitoring</span>
+        <a-select
+          style="width: 250px"
+          :options="groupOptions"
+          v-model:value="wsStore.selectedGroup"
+          @change="wsStore.handleChangeGroup"
+        />
+      </a-space>
+    </a-flex>
+    <a-result v-if="wsStore.filterDeviceByGroup.length === 0" class="no-device">
       <template #title>
         <span>No device online</span>
       </template>
@@ -13,10 +31,11 @@
         :xs="24"
         :md="12"
         :sm="12"
-        :lg="6"
+        :lg="12"
+        :xl="6"
         size="small"
         :bordered="true"
-        v-for="device in wsStore.data"
+        v-for="device in wsStore.filterDeviceByGroup"
         :key="device.area"
         :hoverable="true"
       >
@@ -183,12 +202,15 @@ import ModalSetting from '@/components/dashboard/ModalSetting.vue'
 import BaseCardColumn from '@/components/shared/BaseCardColumn.vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import { useWebSocketStore } from '@/stores/websocket'
-import { onMounted, onUnmounted, watch } from 'vue'
+import { useGroupStore } from '@/stores/group'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 import dayjs from 'dayjs'
 
 const wsStore = useWebSocketStore()
 const dashboardStore = useDashboardStore()
+const groupStore = useGroupStore()
+const groupOptions = ref()
 
 const handleModal = (data, mode) => {
   const mappedData = {
@@ -237,11 +259,18 @@ const formatArea = (str) => {
     .join(' ')
 }
 
+// Hooks
 onMounted(async () => {
-  if ((wsStore.data.length === 0)) {
+  if (wsStore.data.length === 0) {
     wsStore.initializeWsData()
   }
   wsStore.connect('ws://192.168.148.125:5002/rdz-th')
+  await groupStore.getGroup()
+  groupOptions.value = groupStore.groupOptions
+  groupOptions.value.unshift({
+    value: 'ALL',
+    label: 'All',
+  })
 })
 
 // Menutup koneksi websocket ketika component di hapus dari dom
@@ -249,6 +278,7 @@ onUnmounted(() => {
   wsStore.disconnect()
 })
 
+// Watch reload
 watch(
   () => dashboardStore.reload,
   async () => {
@@ -303,5 +333,9 @@ watch(
 
 .small {
   font-size: small;
+}
+
+.x-large {
+  font-size: x-large;
 }
 </style>

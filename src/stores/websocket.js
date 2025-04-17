@@ -6,6 +6,7 @@ import dayjs from 'dayjs'
 const deviceStore = useDeviceStore()
 export const useWebSocketStore = defineStore('websocketRdzTh', {
   state: () => ({
+    selectedGroup: JSON.parse(localStorage.getItem('groupMonitor')) || 'ALL',
     socket: null,
     data: JSON.parse(localStorage.getItem('deviceActive')) || [],
     isConnected: false,
@@ -32,21 +33,26 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
       this.socket.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data)
-          // console.log(this.socket)
+          // console.log(message)
 
           // Perbarui hanya data area yang sesuai
           const index = this.data.findIndex((device) => device.area === message.area)
           if (index !== -1) {
-            this.data[index] = { ...this.data[index], ...message }
+            this.data[index] = {
+              ...this.data[index],
+              ...message,
+              error: message.error || {
+                temperature: { isError: false, reason: '' },
+                humidity: { isError: false, reason: '' },
+              },
+            }
           } else {
             this.initializeWsData()
           }
 
-          this.saveDataToLocalStorage()
-
           console.log(this.data)
 
-          // console.log('Updated data:', this.data)
+          this.saveDataToLocalStorage()
         } catch (error) {
           console.error('Error parsing WebSocket message:', error)
         }
@@ -81,6 +87,7 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
           device.area = newArea
         }
       })
+      console.log('changeArea : ', this.data)
     },
 
     saveDataToLocalStorage() {
@@ -138,7 +145,7 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
           if (device.date) {
             const diffInSeconds = now.diff(dayjs(device.date, 'YYYY-MM-DD HH:mm:ss'), 'second')
             device.disconnected = diffInSeconds >= import.meta.env.VITE_DEVICE_DISCONNECT_INTERVAL
-            console.log(diffInSeconds)
+            // console.log(diffInSeconds)
             if (diffInSeconds >= import.meta.env.VITE_DASHBOARD_REINITIAL_INTERVAL) {
               this.initializeWsData()
             }
@@ -147,6 +154,17 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
 
         this.saveDataToLocalStorage() // ✅ Simpan perubahan ke localStorage
       }, 10000) // Cek setiap 10 detik
+    },
+
+    handleChangeGroup() {
+      localStorage.setItem('groupMonitor', JSON.stringify(this.selectedGroup))
+    },
+  },
+
+  getters: {
+    filterDeviceByGroup: (state) => {
+      if (state.selectedGroup === 'ALL') return state.data
+      return state.data.filter((item) => item.group_id === state.selectedGroup)
     },
   },
 })

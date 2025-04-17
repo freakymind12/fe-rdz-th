@@ -28,7 +28,7 @@
           </span>
         </template>
         <template v-if="['humi_00', 'humi_06', 'humi_12', 'humi_18'].includes(column.key)">
-          <span :class="getClass(record[column.key], record.t_min, record.t_max)">
+          <span :class="getClass(record[column.key], record.h_min, record.h_max)">
             {{ record[column.key] ?? 'N/A' }}
           </span>
         </template>

@@ -113,6 +113,7 @@ import { useWebSocketStore } from '@/stores/websocket'
 import { useGroupStore } from '@/stores/group'
 import { CloseCircleOutlined, CheckCircleOutlined, InfoCircleOutlined } from '@ant-design/icons-vue'
 import { useDebounceFn } from '@vueuse/core'
+import { message } from 'ant-design-vue'
 
 const wsStore = useWebSocketStore()
 const deviceStore = useDeviceStore()
@@ -188,13 +189,17 @@ const handleChangeArea = async () => {
 }
 
 const handleChangeGroup = async () => {
-  await deviceStore.updateGroup({
-    oldArea: dashboardStore.modalData.data.area,
-    group_id: formState.value.group_id,
-  })
-  handleReset()
-  dashboardStore.modalVisible = false
-  dashboardStore.reload = true
+  if (dashboardStore.modalData.data.group_id != formState.value.group_id) {
+    await deviceStore.updateGroup({
+      oldArea: dashboardStore.modalData.data.area,
+      group_id: formState.value.group_id,
+    })
+    handleReset()
+    dashboardStore.modalVisible = false
+    dashboardStore.reload = true
+  }else {
+    message.info("Select another group to change")
+  }
 }
 
 // Gunakan debounce untuk check area yang diinput user
@@ -202,7 +207,7 @@ const debouncedCheckArea = useDebounceFn(async () => {
   if (formState.value.area) {
     duplicatedDevice.value = await deviceStore.checkDuplicateArea({ area: formState.value.area })
   }
-  console.log(duplicatedDevice.value)
+  // console.log(duplicatedDevice.value)
 }, 200)
 
 watch(() => formState.value.area, debouncedCheckArea)
