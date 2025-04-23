@@ -7,11 +7,12 @@
       wrap="wrap"
       gap="small"
     >
-      <span class="bold x-large">Temperature & Humidity Monitor</span>
+      <span class="bold x-large">Temperature & Humidity Monitor </span>
+
       <a-space :size="0" direction="vertical">
-        <span class="bold">Select Group Monitoring</span>
+        <span class="bold">Group</span>
         <a-select
-          style="width: 250px"
+          style="width: 200px;"
           :options="groupOptions"
           v-model:value="wsStore.selectedGroup"
           @change="wsStore.handleChangeGroup"

@@ -144,9 +144,11 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
         this.data.forEach((device) => {
           if (device.date) {
             const diffInSeconds = now.diff(dayjs(device.date, 'YYYY-MM-DD HH:mm:ss'), 'second')
-            device.disconnected = diffInSeconds >= import.meta.env.VITE_DEVICE_DISCONNECT_INTERVAL
-            // console.log(diffInSeconds)
-            if (diffInSeconds >= import.meta.env.VITE_DASHBOARD_REINITIAL_INTERVAL) {
+            device.disconnected =
+              diffInSeconds >= Number(import.meta.env.VITE_DEVICE_DISCONNECT_INTERVAL)
+            console.log(diffInSeconds)
+            if (diffInSeconds >= Number(import.meta.env.VITE_DASHBOARD_REINITIAL_INTERVAL)) {
+              console.log('reinitial karena ada yang disconnect lebih dari 3 menit ')
               this.initializeWsData()
             }
           }

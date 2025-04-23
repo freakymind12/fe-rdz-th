@@ -44,6 +44,8 @@ watch(
   [() => reportStore.yearmonth, () => reportStore.area],
   async ([newYearMonth, newArea], [oldYearMonth, oldArea]) => {
     if (newYearMonth !== oldYearMonth || newArea !== oldArea) {
+      reportStore.pagination.current = 1
+      reportStore.pagination.pageSize = 20
       handleSearch()
     }
   },
