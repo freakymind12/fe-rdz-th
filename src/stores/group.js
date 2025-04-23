@@ -65,5 +65,14 @@ export const useGroupStore = defineStore('group', {
         value: group.group_id,
       }))
     },
+    // Index genap: 0, 2, 4, ...
+    evenGroups(state) {
+      return state.group.filter((_, index) => index % 2 === 0)
+    },
+
+    // Index ganjil: 1, 3, 5, ...
+    oddGroups(state) {
+      return state.group.filter((_, index) => index % 2 !== 0)
+    },
   },
 })

@@ -108,7 +108,6 @@ export const useDeviceStore = defineStore('device', {
           return acc
         }, {}),
       )
-
       return [{ label: 'All', value: 'All' }, ...groupedOptions]
     },
   },

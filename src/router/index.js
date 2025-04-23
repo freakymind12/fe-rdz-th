@@ -36,10 +36,11 @@ const router = createRouter({
             breadcrumb: 'Report',
           },
         },
+
         {
           path: '/master-data',
           name: 'Master Data',
-          component: () => import('@/views/master/MasterData.vue'),
+          component: () => import('@/views/master/DataMaster.vue'),
           meta: {
             breadcrumb: 'Master Data',
           },
