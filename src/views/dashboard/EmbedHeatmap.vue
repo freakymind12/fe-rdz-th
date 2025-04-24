@@ -1,5 +1,6 @@
 <template>
   <div>
+    <span class="bold x-large">Heatmap RDZ Device</span>
     <iframe :src="embedURL" class="embed"></iframe>
   </div>
 </template>
@@ -10,8 +11,9 @@ const embedURL = import.meta.env.VITE_HEATMAP_DASHBOARD_URL
 
 <style scoped>
 .embed {
-  height: 90vh;
+  height: 82vh;
   width: 100%;
   border: none;
+  border-radius: 10px;
 }
 </style>
