@@ -26,18 +26,16 @@
           <a-flex justify="space-between" gap="small">
             <a-input
               ref="inputRef"
+              addon-before="Email"
               v-model:value="newEmail"
               placeholder="Please enter new email"
               :status="emailError ? 'error' : ''"
             />
-            <a-button type="primary" @click="addEmail">
-              <template #icon>
-                <PlusOutlined />
-              </template>
-              Add
+            <a-button type="primary" @click="addEmail" style="background-color: #55ad9b">
+              Save
             </a-button>
           </a-flex>
-          <span v-if="emailError" style="color: red;">{{ emailError }}</span>
+          <span v-if="emailError" style="color: red">{{ emailError }}</span>
         </template>
       </a-select>
     </a-form-item>
@@ -51,7 +49,6 @@
 import { usePicStore } from '@/stores/pic'
 import { useGroupStore } from '@/stores/group'
 import { onMounted, ref, defineComponent } from 'vue'
-import { PlusOutlined } from '@ant-design/icons-vue'
 
 const VNodes = defineComponent({
   props: {
@@ -82,8 +79,6 @@ const addEmail = async () => {
   }
 
   emailError.value = ''
-
-  console.log('addEmail:', newEmail.value)
 
   await picStore.addPic({ email: newEmail.value })
   // Reset input dan fokus ulang
