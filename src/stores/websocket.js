@@ -134,29 +134,46 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
       }))
 
       this.saveDataToLocalStorage()
+
     },
 
-    // interval check for device didnt send payload data in 1 minute
     checkInactiveDevices() {
       setInterval(() => {
         const now = dayjs()
+        let needReinit = false
 
-        this.data.forEach((device) => {
+        this.data.forEach(device => {
           if (device.date) {
-            const diffInSeconds = now.diff(dayjs(device.date, 'YYYY-MM-DD HH:mm:ss'), 'second')
+            const diff = now.diff(dayjs(device.date, 'YYYY-MM-DD HH:mm:ss'), 'second')
+
             device.disconnected =
-              diffInSeconds >= Number(import.meta.env.VITE_DEVICE_DISCONNECT_INTERVAL)
-            console.log(diffInSeconds)
-            if (diffInSeconds >= Number(import.meta.env.VITE_DASHBOARD_REINITIAL_INTERVAL)) {
-              console.log('reinitial karena ada yang disconnect lebih dari 3 menit ')
-              this.initializeWsData()
+              diff >= Number(import.meta.env.VITE_DEVICE_DISCONNECT_INTERVAL)
+
+            // Jika ada **satu** saja yang melewati ambang re‑initial,
+            // set penanda ‑ tapi JANGAN panggil fungsi di sini.
+            if (diff >= Number(import.meta.env.VITE_DASHBOARD_REINITIAL_INTERVAL)) {
+              needReinit = true
             }
+            console.log('Disconnect interval :', Number(import.meta.env.VITE_DEVICE_DISCONNECT_INTERVAL))
+            console.log('Disconnect interval :', Number(import.meta.env.VITE_DASHBOARD_REINITIAL_INTERVAL))
+            console.log(`perbedaan detik ${device.area} :`, diff)
           }
         })
 
-        this.saveDataToLocalStorage() // ✅ Simpan perubahan ke localStorage
-      }, 10000) // Cek setiap 10 detik
+        // Panggil sekali di luar loop ketika diperlukan
+        if (needReinit) {
+          this.initializeWsData()
+          notification.info({
+            message: 'Auto Refresh',
+            description: 'Refresh device connected',
+            placement: 'bottomRight',
+          })
+        }
+
+        this.saveDataToLocalStorage()
+      }, 10000) // cek tiap 10 detik
     },
+
 
     handleChangeGroup() {
       localStorage.setItem('groupMonitor', JSON.stringify(this.selectedGroup))
