@@ -15,15 +15,19 @@
       </a-col>
     </a-row>
 
+    <a-result v-if="groupStore.group.length === 0" class="no-device">
+      <template #title>
+        <span>No group data</span>
+      </template>
+      <template #subTitle>
+        <span>Click the floating button on bottom right to add a group device</span>
+      </template>
+    </a-result>
+
     <!-- Float Button Add Group -->
-    <a-float-button
-      tooltip="Add New Group"
-      type="primary"
-      :style="{
-        right: '24px',
-      }"
-      @click="handleAdd"
-    >
+    <a-float-button tooltip="Add New Group" type="primary" :style="{
+      right: '24px',
+    }" @click="handleAdd">
       <template #icon>
         <PlusCircleOutlined />
       </template>
@@ -85,3 +89,9 @@ onMounted(async () => {
   await groupStore.getGroup()
 })
 </script>
+
+<style scoped>
+.no-device {
+  padding-top: 15%;
+}
+</style>
