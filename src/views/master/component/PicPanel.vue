@@ -7,28 +7,38 @@
       </a-flex>
     </template>
 
-    <a-flex justify="flex-end" class="mb">
+    <a-flex justify="space-between" class="mb" align="center">
+      <a-input
+        size="small"
+        style="width: 400px"
+        v-model:value="searchFilter"
+        placeholder="Search email here"
+        allow-clear
+      >
+        <template #addonBefore> <SearchOutlined /> </template>
+      </a-input>
+
       <a-button type="primary" size="small" @click="handleAssign"><UserOutlined /> Add</a-button>
     </a-flex>
-    <a-flex vertical gap="small">
-      <a-card
-        size="small"
-        class="bold"
-        v-for="{ email, pic_id, pic_group_id } in data"
-        :key="pic_id"
-      >
-        <a-flex justify="space-between">
-          <span class="bold">{{ email }}</span>
-          <a-popconfirm
-            title="Are you sure to delete this email from group ?"
-            @confirm="handleDelete(pic_group_id)"
-          >
-            <a-button danger type="primary" size="small"><DeleteOutlined /> </a-button>
-          </a-popconfirm>
-        </a-flex>
-      </a-card>
-      <a-empty v-if="!data.length" description="There is no data pic for this group" />
-    </a-flex>
+
+    <a-row :gutter="[8, 8]" class="wrapper-pic">
+      <a-col :span="12" v-for="{ email, pic_id, pic_group_id } in filteredData" :key="pic_id">
+        <a-card size="small" class="bold " :hoverable="true">
+          <a-flex justify="space-between" align="center" wrap="wrap">
+            <span class="bold"><UserOutlined /> {{ email }}</span>
+            <a-popconfirm
+              title="Delete this email from group ?"
+              @confirm="handleDelete(pic_group_id)"
+            >
+              <a-button danger type="primary" size="small"><DeleteOutlined /> </a-button>
+            </a-popconfirm>
+          </a-flex>
+        </a-card>
+      </a-col>
+      <a-col :span="24" v-if="data.length == 0">
+        <a-empty description="There is no data pic for this group" />
+      </a-col>
+    </a-row>
 
     <Teleport to="body">
       <BaseModal
@@ -46,8 +56,8 @@
 </template>
 
 <script setup>
-import { UserOutlined, DeleteOutlined } from '@ant-design/icons-vue'
-import { ref } from 'vue'
+import { UserOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons-vue'
+import { computed, ref } from 'vue'
 import { usePicStore } from '@/stores/pic'
 import { useGroupStore } from '@/stores/group'
 import BaseModal from '@/components/shared/BaseModal.vue'
@@ -55,6 +65,7 @@ import FormAssign from './FormAssign.vue'
 
 const groupStore = useGroupStore()
 const picStore = usePicStore()
+const searchFilter = ref('')
 
 const props = defineProps({
   data: Array,
@@ -88,4 +99,17 @@ const handleDelete = async (item) => {
   await picStore.unassignPic(item)
   await groupStore.getGroup()
 }
+
+const filteredData = computed(() =>
+  props.data.filter((item) => item.email.toLowerCase().includes(searchFilter.value.toLowerCase())),
+)
 </script>
+
+<style scoped>
+.wrapper-pic {
+  padding: 5px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+</style>
