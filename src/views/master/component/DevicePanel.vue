@@ -37,13 +37,57 @@ const columns = [
     title: 'Area',
     dataIndex: 'device_area',
     key: 'device_area',
-    sorter: (a, b) => a.device_area - b.device_area,
+    sorter: (a, b) => a.device_area.localeCompare(b.device_area),
   },
   {
     title: 'Status',
     dataIndex: 'status',
     key: 'status',
     sorter: (a, b) => a.status - b.status,
+    width: 100,
+  },
+  {
+    title: 'Sensor Configuration',
+    children: [
+      {
+        title: 'Temperature',
+        children: [
+          {
+            title: 'Min',
+            dataIndex: 't_min',
+            key: 't_min',
+            sorter: (a, b) => a.t_min - b.t_min,
+            width: 75,
+          },
+          {
+            title: 'Max',
+            dataIndex: 't_max',
+            key: 't_max',
+            sorter: (a, b) => a.t_max - b.t_max,
+            width: 75,
+          },
+        ],
+      },
+      {
+        title: 'Humidity',
+        children: [
+          {
+            title: 'Min',
+            dataIndex: 'h_min',
+            key: 'h_min',
+            sorter: (a, b) => a.h_min - b.h_min,
+            width: 75,
+          },
+          {
+            title: 'Max',
+            dataIndex: 'h_max',
+            key: 'h_max',
+            sorter: (a, b) => a.h_max - b.h_max,
+            width: 75,
+          },
+        ],
+      },
+    ],
   },
 ]
 
