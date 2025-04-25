@@ -1,6 +1,7 @@
 import { notification } from 'ant-design-vue'
 import { defineStore } from 'pinia'
 import { useDeviceStore } from './device'
+import { dayjsModified } from '@/composable/dayjsModified'
 import dayjs from 'dayjs'
 
 const deviceStore = useDeviceStore()
@@ -50,7 +51,7 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
             this.initializeWsData()
           }
 
-          console.log(this.data)
+          // console.log(this.data)
 
           this.saveDataToLocalStorage()
         } catch (error) {
@@ -101,7 +102,7 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
       this.data = deviceStore.devices.map((device) => ({
         area: device.area,
         regional: device.regional,
-        date: dayjs(device.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+        date: dayjsModified(device.updated_at).format('YYYY-MM-DD HH:mm:ss'),
         group_id: device.group_id,
         group_name: device.group_name,
         status: device.status,
@@ -139,7 +140,7 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
 
     checkInactiveDevices() {
       setInterval(() => {
-        const now = dayjs()
+        const now = dayjsModified()
         let needReinit = false
 
         this.data.forEach(device => {
@@ -154,9 +155,9 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
             if (diff >= Number(import.meta.env.VITE_DASHBOARD_REINITIAL_INTERVAL)) {
               needReinit = true
             }
-            console.log('Disconnect interval :', Number(import.meta.env.VITE_DEVICE_DISCONNECT_INTERVAL))
-            console.log('Disconnect interval :', Number(import.meta.env.VITE_DASHBOARD_REINITIAL_INTERVAL))
-            console.log(`perbedaan detik ${device.area} :`, diff)
+            // console.log('Disconnect interval :', Number(import.meta.env.VITE_DEVICE_DISCONNECT_INTERVAL))
+            // console.log('Disconnect interval :', Number(import.meta.env.VITE_DASHBOARD_REINITIAL_INTERVAL))
+            // console.log(`perbedaan detik ${device.area} :`, diff)
           }
         })
 
