@@ -1,0 +1,17 @@
+services:
+  fe-rdz-th:
+    image: node:20 # Menggunakan image resmi Node.js versi 20
+    container_name: rdz-th-frontend
+    restart: always
+    working_dir: /frontend
+    ports:
+      - '4175:4173'
+    volumes:
+      - .:/frontend
+      - /frontend/node_modules
+      - .env:/frontend/.env
+    env_file:
+      - ./frontend/.env
+    environment:
+      - TZ=Asia/Jakarta # Mengatur timezone container
+    command: sh -c "npm install && npm run build && npm run preview -- --host 0.0.0.0"
