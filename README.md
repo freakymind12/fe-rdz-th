@@ -1,35 +1,87 @@
-# dashboard-rdz-th
+# 🖥 RDZ-TH Frontend
 
-This template should help get you started developing with Vue 3 in Vite.
+Frontend dashboard **IoT Project RDZ-TH Web Apps** for device control and reporting temperature and humidity. This project created using [**NodeJS**](https://nodejs.org/en) , [**Vue 3**](https://vuejs.org/), [**Pinia**](https://pinia.vuejs.org/), [**Ant Design Vue**](https://antdv.com/)
 
-## Recommended IDE Setup
+---
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Features
 
-## Customize configuration
+- 📧 **Report** : Table based view for report RDZ-TH device data
+- 📄 **PDF Download** : Report table download with `.pdf` extension for report RDZ-TH device
+- 📶 **Realtime Monitoring** : Realtime Dashboard Monitoring for RDZ-TH device
+- ⚙ **Master Data** : Manage RDZ-TH device data for grouping and assign PIC (for receiver daily reporting by email)
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+## Project Structure
 
-## Project Setup
+```bash
+fe-rdz-th
+┣ .vscode
+┃  ┗ extensions.json
+┣ public
+┃  ┗ favicon.ico
+┣ src
+┃ ┣ assets                  # asset folder for image or global styling
+┃ ┣ axios                   # axios config
+┃ ┣ components              # global components
+┃ ┣ composable              # composable function
+┃ ┣ layout                  # layout views
+┃ ┣ router                  # routing address for app
+┃ ┣ stores                  # store management
+┃ ┣ views                   # component views
+┃ ┃ ┣ dashboard              # dashboard views
+┃ ┃ ┣ master                 # master views
+┃ ┃ ┣ pages                  # pages views
+┃ ┃ ┗ report                 # report views
+┃ ┣ App.vue                 # root component app
+┗ ┗ main.js                 # entry point to start a Vue application
+```
 
-```sh
+---
+
+## Getting Started
+
+### Clone Repository
+
+```bash
+git clone https://github.com/HRSID-Development/fe-rdz-th.git
+cd fe-rdz-th
+```
+
+### Install dependencies
+
+```bash
 npm install
 ```
 
+### Setup Environtment Variable
+
+See `.env.example` for template making your environtment variable on file `.env`
+
 ### Compile and Hot-Reload for Development
 
-```sh
+```bash
 npm run dev
 ```
 
-### Compile and Minify for Production
+### Compile and Minify for Production and Preview
 
-```sh
+```bash
 npm run build
+npm run preview
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+### Run with docker-compose
 
-```sh
-npm run lint
+```bash
+docker compose up -d
 ```
+
+---
+
+## Requirements
+
+- NodeJS v20 or latest
+
+## Authors
+
+- [@riankurniawan](https://github.com/freakymind12)
