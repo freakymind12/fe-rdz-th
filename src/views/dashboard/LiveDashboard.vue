@@ -254,7 +254,9 @@ const daysRemaining = (targetDate) => {
 
 // Format device area string
 const formatArea = (str) => {
-  return str.replace(/(^|_)([a-z])/g, (_, p1, p2) => (p1 === '_' ? ' ' : '') + p2.toUpperCase());
+  return str
+    .replace(/_/g, ' ') // Ganti semua underscore dengan spasi
+    .replace(/\b[a-z]/g, (match) => match.toUpperCase()); // Kapitalisasi huruf pertama tiap kata
 };
 
 // Hooks

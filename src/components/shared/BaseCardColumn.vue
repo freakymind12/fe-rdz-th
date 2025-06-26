@@ -58,9 +58,10 @@ defineProps({
     transform 0.5s ease;
 }
 
+
 .bordered:hover {
   border-color: rgba(32, 87, 129, 1);
-  transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0.95); /* Membesarkan ukuran */
+  transform: scale(1.05); /* atau 1.05 sesuai kebutuhan */
   z-index: 1000;
 }
 </style>
