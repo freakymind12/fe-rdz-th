@@ -84,11 +84,6 @@ export const useDeviceStore = defineStore('device', {
         console.error(error)
       }
     },
-
-    getStatusByArea(area) {
-      const device = this.devices.find((device) => device.area === area)
-      return device ? device.status : 0
-    },
   },
   getters: {
     deviceOptions: (state) => {
@@ -102,13 +97,27 @@ export const useDeviceStore = defineStore('device', {
 
           acc[groupName].options.push({
             value: device.area,
-            label: `${device.area}`,
+            label: device.area.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())
           })
 
           return acc
         }, {}),
       )
       return [{ label: 'All', value: 'All' }, ...groupedOptions]
+    },
+
+    deviceUnlinkedOptions: (state) => {
+      return state.devices
+        .filter(device => device.group_id === null)
+        .map((device) => ({
+          value: device.area,
+          label: device.area.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())
+        }))
+    },
+
+    getStatusByArea(area) {
+      const device = this.devices.find((device) => device.area === area)
+      return device ? device.status : 0
     },
   },
 })
