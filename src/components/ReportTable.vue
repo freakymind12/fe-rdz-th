@@ -1,22 +1,14 @@
 <template>
   <div class="table">
-    <a-table
-      class="ant-table-striped"
-      :columns="columns"
-      :data-source="data"
-      bordered
-      :pagination="{
-        pageSizeOptions: ['20', '50', '100'],
-        current: reportStore.pagination.current,
-        pageSize: reportStore.pagination.pageSize,
-        total: reportStore.pagination.total,
-        showSizeChanger: true,
-        onChange: reportStore.setPage,
-        onShowSizeChange: (current, size) => reportStore.setPageSize(size),
-      }"
-      :scroll="{ x: 'max-content', y: 550 }"
-      size="small"
-    >
+    <a-table class="ant-table-striped" :columns="columns" :data-source="data" bordered :pagination="{
+      pageSizeOptions: ['20', '50', '100'],
+      current: reportStore.pagination.current,
+      pageSize: reportStore.pagination.pageSize,
+      total: reportStore.pagination.total,
+      showSizeChanger: true,
+      onChange: reportStore.setPage,
+      onShowSizeChange: (current, size) => reportStore.setPageSize(size),
+    }" :scroll="{ x: 'max-content', y: 410 }" size="small">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'group_name'">
           <a-tag class="bold" color="#AC1754" v-if="!record.group_name">Ungrouped</a-tag>
@@ -34,10 +26,9 @@
         </template>
       </template>
       <template #footer>
-        <span class="bold">Total Data </span> : {{ reportStore.reports.total }} Rows</template
-      >
+        <span class="bold">Total Data </span> : {{ reportStore.reports.total }} Rows</template>
       <template #emptyText>
-        <a-empty>
+        <a-empty class="empty-table">
           <template #description>
             <span class="bold">There is no data for this search filter</span>
           </template>
@@ -230,6 +221,10 @@ defineProps({
 </script>
 
 <style scoped>
+.empty-table {
+  padding: 100px 0
+}
+
 .no-data {
   font-weight: 650;
 }
@@ -252,10 +247,6 @@ defineProps({
 .error-min {
   color: #4f959d;
   font-weight: bold;
-}
-
-.table {
-  max-height: 780px;
 }
 
 .bold {
