@@ -6,12 +6,23 @@
         <a-tag class="bold" color="#3674B5">{{ data.length }} Devices</a-tag>
       </a-flex>
     </template>
+    <a-flex justify="flex-end" class="wrapper-button">
+      <a-button type="primary" size="small" @click="handleOpenModal">Link new
+        device to this group</a-button>
+    </a-flex>
     <MasterTable :columns="columns" :data="data" :scroll-y="200">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'status'">
           <a-tag class="bold" :color="record.status ? 'green' : 'red'">{{
             record.status ? 'Enabled' : 'Disabled'
-          }}</a-tag>
+            }}</a-tag>
+        </template>
+        <template v-if="column.key === 'action'">
+          <a-flex justify="center">
+            <a-popconfirm title="Are you sure unlink this device from group ?" @confirm="handleUnlinkDevice(record)">
+              <a-button danger type="primary" size="small">Unlink</a-button>
+            </a-popconfirm>
+          </a-flex>
         </template>
       </template>
       <template #footer>
@@ -26,11 +37,71 @@
         </a-flex>
       </template>
     </MasterTable>
+    <!-- Modal Link new device -->
+    <Teleport to="body">
+      <BaseModal :visible="modalData.visible" :modal-title="modalData.title" @close="handleClose">
+        <template #body>
+          <FormLinkDevice @close="handleClose" @link-new="handleAction" />
+        </template>
+      </BaseModal>
+    </Teleport>
   </a-collapse-panel>
+
+
 </template>
 
 <script setup>
 import MasterTable from '@/components/shared/MasterTable.vue'
+import BaseModal from '@/components/shared/BaseModal.vue'
+import FormLinkDevice from './FormLinkDevice.vue'
+import { useDeviceStore } from '@/stores/device'
+import { useGroupStore } from '@/stores/group'
+import { useWebSocketStore } from '@/stores/websocket'
+import { ref } from 'vue'
+
+const groupStore = useGroupStore()
+const deviceStore = useDeviceStore()
+const wsStore = useWebSocketStore()
+
+const props = defineProps({
+  data: Array,
+  group: Object
+})
+
+const modalData = ref({
+  visible: false,
+  data: null,
+  title: '',
+})
+
+const handleOpenModal = () => {
+  modalData.value.visible = true
+  modalData.value.title = `Link new device to [${props.group.group_name}]`
+  modalData.value.data = null
+}
+
+const handleClose = (isVisible) => {
+  modalData.value.visible = isVisible
+}
+
+const handleAction = async (data) => {
+  const { group_name, group_id } = props.group
+  for (const area of data.area) {
+    const payload = {
+      oldArea: area,
+      group_id
+    }
+    await deviceStore.updateGroup(payload)
+    const target = wsStore.data.find(item => item.area === area)
+    if (target) {
+      target.group_id = group_id
+      target.group_name = group_name
+    }
+    console.log(target)
+  }
+  await groupStore.getGroup()
+  await deviceStore.getDevice()
+}
 
 const columns = [
   {
@@ -89,9 +160,32 @@ const columns = [
       },
     ],
   },
+  {
+    title: 'Action',
+    key: 'action',
+    width: 100,
+  },
 ]
 
-defineProps({
-  data: Array,
-})
+const handleUnlinkDevice = async (data) => {
+  const { device_area } = data
+  // update device data pada db
+  await deviceStore.updateGroup({ oldArea: device_area, group_id: null })
+  // fetch data hasil pembaruan
+  await groupStore.getGroup()
+  // fetch ulang device
+  await deviceStore.getDevice()
+  // perbarui data device pada state websocket
+  const target = wsStore.data.find(item => item.area === device_area)
+  if (target) {
+    target.group_id = null
+    target.group_name = null
+  }
+}
 </script>
+
+<style scoped>
+.wrapper-button {
+  margin-bottom: 8px;
+}
+</style>

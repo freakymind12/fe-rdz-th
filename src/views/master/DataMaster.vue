@@ -1,5 +1,8 @@
 <template>
   <div>
+    <a-divider orientation="left">
+      <span class="x-large divider-title bold">Device Group</span>
+    </a-divider>
     <a-row :gutter="[8, 8]" :wrap="true">
       <!-- Render Groups yang punya index genap -->
       <a-col :xs="24" :lg="12">
@@ -46,6 +49,7 @@
 
 <script setup>
 import { useGroupStore } from '@/stores/group'
+import { useDeviceStore } from '@/stores/device'
 import { PlusCircleOutlined } from '@ant-design/icons-vue'
 import GroupCard from './component/GroupCard.vue'
 import BaseModal from '@/components/shared/BaseModal.vue'
@@ -53,6 +57,7 @@ import FormGroup from './component/FormGroup.vue'
 
 import { onMounted, ref } from 'vue'
 
+const deviceStore = useDeviceStore()
 const groupStore = useGroupStore()
 
 const modalData = ref({
@@ -69,7 +74,6 @@ const handleEdit = (item) => {
     data: item,
     mode: 'edit',
   }
-  console.log(modalData.value.data)
 }
 
 const handleAdd = () => {
@@ -86,6 +90,7 @@ const handleClose = (isVisible) => {
 }
 
 onMounted(async () => {
+  await deviceStore.getDevice()
   await groupStore.getGroup()
 })
 </script>
@@ -93,5 +98,11 @@ onMounted(async () => {
 <style scoped>
 .no-device {
   padding-top: 15%;
+}
+
+.divider-title {
+  background-color: #f5f5f5;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 </style>

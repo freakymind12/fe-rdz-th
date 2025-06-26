@@ -2,7 +2,7 @@
   <a-collapse-panel>
     <template #header>
       <a-flex justify="space-between" align="center" wrap="wrap">
-        <span class="bold">PIC List</span>
+        <span class="bold">Persons In Charge</span>
         <a-tag class="bold" color="#3674B5"> {{ data.length }} Persons</a-tag>
       </a-flex>
     </template>
