@@ -10,8 +10,12 @@
       <a-button type="primary" size="small" @click="handleOpenModal">Link new
         device to this group</a-button>
     </a-flex>
-    <MasterTable :columns="columns" :data="data" :scroll-y="200">
+    <MasterTable :columns="columns" :data="data" :scroll="{ x: 'max-content', y: 200 }">
       <template #bodyCell="{ column, record }">
+        <template v-if="['n_min', 'n_max', 'p_min', 'p_max'].includes(column.key)">
+          <span v-if="record[column.key] != null">{{ record[column.key] }}</span>
+          <a-tag class="bold" v-else color="red">Unsupported</a-tag>
+        </template>
         <template v-if="column.key === 'status'">
           <a-tag class="bold" :color="record.status ? 'green' : 'red'">{{
             record.status ? 'Enabled' : 'Disabled'
@@ -108,11 +112,13 @@ const columns = [
     title: 'Area',
     dataIndex: 'device_area',
     key: 'device_area',
+    fixed: 'left',
     sorter: (a, b) => a.device_area.localeCompare(b.device_area),
   },
   {
     title: 'Status',
     dataIndex: 'status',
+    fixed: 'left',
     key: 'status',
     sorter: (a, b) => a.status - b.status,
     width: 100,
@@ -154,6 +160,44 @@ const columns = [
             dataIndex: 'h_max',
             key: 'h_max',
             sorter: (a, b) => a.h_max - b.h_max,
+            width: 75,
+          },
+        ],
+      },
+      {
+        title: 'Noise',
+        children: [
+          {
+            title: 'Min',
+            dataIndex: 'n_min',
+            key: 'n_min',
+            sorter: (a, b) => a.n_min - b.n_min,
+            width: 75,
+          },
+          {
+            title: 'Max',
+            dataIndex: 'n_max',
+            key: 'n_max',
+            sorter: (a, b) => a.n_max - b.n_max,
+            width: 75,
+          },
+        ],
+      },
+      {
+        title: 'Pressure',
+        children: [
+          {
+            title: 'Min',
+            dataIndex: 'p_min',
+            key: 'p_min',
+            sorter: (a, b) => a.p_min - b.p_min,
+            width: 75,
+          },
+          {
+            title: 'Max',
+            dataIndex: 'p_max',
+            key: 'p_max',
+            sorter: (a, b) => a.p_max - b.p_max,
             width: 75,
           },
         ],
