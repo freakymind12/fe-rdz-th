@@ -108,8 +108,10 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
         status: device.status,
         disconnected: false,
         sensor: {
-          temp: 0,
-          humi: 0,
+          temp: null,
+          humi: null,
+          pressure: null,
+          noise: null,
           t_min: Number(device.t_min).toFixed(0),
           t_max: Number(device.t_max).toFixed(0),
           h_min: Number(device.h_min).toFixed(0),
