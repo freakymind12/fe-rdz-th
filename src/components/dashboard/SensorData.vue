@@ -1,6 +1,6 @@
 <template>
   <!-- Temporary condition waiting update sensor payload -->
-  <a-flex vertical align="center" class="wrapper-data" v-if="value != 0 || null" :gap="0">
+  <a-flex vertical align="center" class="wrapper-data" v-if="value !== 0 && value !== null" :gap="0">
     <span class="bold">{{ sensorLabel }}</span>
     <transition name="zoom" mode="out-in">
       <span class="x-large bold" :class="{ 'ng-sensor': isOutOfRange }" :key="value">
@@ -86,6 +86,7 @@ const isOutOfRange = computed(() => {
   return value.value <= min.value || value.value >= max.value
 })
 
+console.log(`${props.sensorLabel} - ${value.value}`)
 // Get & Format Sensor Data
 const sensorDisplay = computed(() => {
   const units = {

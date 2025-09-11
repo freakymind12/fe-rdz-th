@@ -2,13 +2,15 @@
   <div>
     <a-flex justify="space-between" align="center" style="margin-bottom: 1rem" wrap="wrap" gap="small">
       <span class="bold x-large">Temperature & Humidity Monitor </span>
-
       <a-space :size="0" direction="vertical">
         <span class="bold">Group</span>
         <a-select style="width: 200px;" :options="groupOptions" v-model:value="wsStore.selectedGroup"
           @change="wsStore.handleChangeGroup" />
       </a-space>
     </a-flex>
+    <a-divider orientation="left">
+      <a-tag class="large" color="#212121">{{ wsStore.filterDeviceByGroup?.length }} Devices</a-tag>
+    </a-divider>
     <a-result v-if="wsStore.filterDeviceByGroup.length === 0" class="no-device">
       <template #title>
         <span>No device online</span>
