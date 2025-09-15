@@ -2,15 +2,26 @@
   <div>
     <a-flex justify="space-between" align="center" style="margin-bottom: 1rem" wrap="wrap" gap="small">
       <span class="bold x-large">Temperature & Humidity Monitor </span>
-      <a-space :size="0" direction="vertical">
-        <span class="bold">Group</span>
-        <a-select style="width: 200px;" :options="groupOptions" v-model:value="wsStore.selectedGroup"
-          @change="wsStore.handleChangeGroup" />
+      <a-space :size="10" align="center" wrap>
+        <a-space direction="vertical" :size="0">
+          <span class="medium">Connected</span>
+          <a-tag class="large device-tag" color="green">{{ wsStore.filterDeviceByGroup?.length }}
+            Devices</a-tag>
+        </a-space>
+        <a-space direction="vertical" :size="0">
+          <span class="medium b">Disconnected</span>
+          <a-tag @click="openDrawer" class="large device-tag" color="red">{{ deviceStore.totalDeviceStatusZero.total }}
+            Devices</a-tag>
+        </a-space>
+        <a-space :size="0" direction="vertical">
+          <span class="bold">Group</span>
+          <a-select style="width: 200px;" :options="groupOptions" v-model:value="wsStore.selectedGroup"
+            @change="wsStore.handleChangeGroup" />
+        </a-space>
       </a-space>
     </a-flex>
-    <a-divider orientation="left">
-      <a-tag class="large" color="#212121">{{ wsStore.filterDeviceByGroup?.length }} Devices</a-tag>
-    </a-divider>
+
+
     <a-result v-if="wsStore.filterDeviceByGroup.length === 0" class="no-device">
       <template #title>
         <span>No device online</span>
@@ -49,7 +60,7 @@
             <a-flex justify="space-evenly" align="center" wrap="wrap">
               <!-- Temperature Sensor Data -->
               <SensorData :device="device" sensorKey="sensor.temp" sensorLabel="Temperature" minKey="sensor.t_min"
-                maxKey="sensor.t_max" errorPath="error.temperature.isError" reasonPath="error.temperature.reason"/>
+                maxKey="sensor.t_max" errorPath="error.temperature.isError" reasonPath="error.temperature.reason" />
               <!-- Humidity Sensor Data -->
               <SensorData :device="device" sensorKey="sensor.humi" sensorLabel="Humidity" minKey="sensor.h_min"
                 maxKey="sensor.h_max" errorPath="error.humidity.isError" reasonPath="error.humidity.reason" />
@@ -94,15 +105,35 @@
       </BaseCardColumn>
     </a-row>
     <ModalSetting />
+    <BaseDrawer :visible="drawerVisible" @close="closeDrawer" title="Disconnected Device">
+      <a-flex vertical gap="small">
+        <a-card size="small" v-for="device in deviceStore.totalDeviceStatusZero.data" :key="device.area" hoverable>
+          <span class="medium bold">{{ formatArea(device.area) }}</span>
+          <a-flex :gap="0">
+            <a-space :size="0" direction="vertical">
+              <span class="small">Last Updated</span>
+              <a-tag color="grey">{{ dayjs(device.updated_at).format("YYYY-MM-DD HH:mm:ss") }}</a-tag>
+            </a-space>
+            <a-space :size="0" direction="vertical">
+              <span class="small">Dept</span>
+              <a-tag :color="device.group_name ? '#3D8D7A' : '#AC1754'"> {{ device.group_name || 'Ungrouped' }}</a-tag>
+            </a-space>
+          </a-flex>
+
+        </a-card>
+      </a-flex>
+    </BaseDrawer>
   </div>
 </template>
 
 <script setup>
 import ModalSetting from '@/components/dashboard/ModalSetting.vue'
+import BaseDrawer from '@/components/shared/BaseDrawer.vue'
 import BaseCardColumn from '@/components/shared/BaseCardColumn.vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import { useWebSocketStore } from '@/stores/websocket'
 import { useGroupStore } from '@/stores/group'
+import { useDeviceStore } from '@/stores/device'
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import SensorData from '@/components/dashboard/SensorData.vue'
 
@@ -111,6 +142,7 @@ import dayjs from 'dayjs'
 const wsStore = useWebSocketStore()
 const dashboardStore = useDashboardStore()
 const groupStore = useGroupStore()
+const deviceStore = useDeviceStore()
 const groupOptions = ref()
 
 // Handle modal operation
@@ -128,6 +160,16 @@ const handleModal = (data, mode) => {
   dashboardStore.modalData.data = mappedData
   dashboardStore.modalData.mode = mode
   dashboardStore.modalVisible = true
+}
+
+const drawerVisible = ref(false)
+
+const openDrawer = () => {
+  drawerVisible.value = true
+}
+
+const closeDrawer = () => {
+  drawerVisible.value = false
 }
 
 // Access Websocket Data
@@ -163,6 +205,7 @@ const formatArea = (str) => {
 
 // Hooks
 onMounted(async () => {
+  await deviceStore.getDevice()
   if (wsStore.data.length === 0) {
     wsStore.initializeWsData()
   }
@@ -199,5 +242,13 @@ watch(
 
 .wrapper-data {
   padding: 0.5rem;
+}
+
+.device-tag {
+  padding: 4px;
+}
+
+.device-tag:hover {
+  cursor: pointer;
 }
 </style>

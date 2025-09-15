@@ -119,5 +119,13 @@ export const useDeviceStore = defineStore('device', {
       const device = this.devices.find((device) => device.area === area)
       return device ? device.status : 0
     },
+
+    totalDeviceStatusZero(state) {
+      const data = state.devices.filter(device => device.status === 0)
+      return {
+        total: data.length,
+        data: data
+      }
+    },
   },
 })
