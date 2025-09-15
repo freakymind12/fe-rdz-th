@@ -1,6 +1,5 @@
 <template>
-  <!-- Temporary condition waiting update sensor payload -->
-  <a-flex vertical align="center" class="wrapper-data" v-if="value !== 0 && value !== null" :gap="0">
+  <a-flex v-if="showComponent" vertical align="center" class="wrapper-data" :gap="0">
     <span class="bold">{{ sensorLabel }}</span>
     <transition name="zoom" mode="out-in">
       <span class="x-large bold" :class="{ 'ng-sensor': isOutOfRange }" :key="value">
@@ -11,8 +10,8 @@
     </transition>
 
     <a-flex vertical :gap="0" wrap="wrap" align="center">
-      <span>Min : {{ min || '-' }} {{ sensorDisplay?.split(' ').pop() }}</span>
-      <span>Max : {{ max || '-' }} {{ sensorDisplay?.split(' ').pop() }}</span>
+      <span>Min : {{ min || '-' }} {{ unit }}</span>
+      <span>Max : {{ max || '-' }} {{ unit }}</span>
     </a-flex>
 
     <a-flex justify="space-between" gap="small" wrap="wrap" align="center">
@@ -39,7 +38,7 @@
 <script setup>
 import { LoadingOutlined } from '@ant-design/icons-vue'
 import { useWebSocketStore } from '@/stores/websocket'
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 
 const wsStore = useWebSocketStore()
 
@@ -55,6 +54,10 @@ const props = defineProps({
   errorPath: String, // contoh: 'error.temperature.isError'
   reasonPath: String, // contoh: 'error.temperature.reason'
 })
+
+// State for controlling component visibility
+const showComponent = ref(true)
+let hideTimeout = null
 
 // Access Websocket Data
 const getWsData = (area, key) => {
@@ -79,30 +82,63 @@ const getWsData = (area, key) => {
   return result !== undefined ? result : null
 }
 
+// Computed properties for sensor data
 const value = computed(() => getWsData(props.device.area, props.sensorKey))
 const min = computed(() => getWsData(props.device.area, props.minKey))
 const max = computed(() => getWsData(props.device.area, props.maxKey))
+
+// Computed properties for error handling
+const isError = computed(() => getWsData(props.device.area, props.errorPath))
+const errorReasons = computed(() => getWsData(props.device.area, props.reasonPath) || [])
+
+// Sensor display formatting
+const units = {
+  'sensor.temp': '°C',
+  'sensor.humi': '%',
+  'sensor.pressure': 'Pa',
+  'sensor.noise': 'dB',
+}
+
+const unit = computed(() => units[props.sensorKey] || '')
+const sensorDisplay = computed(() => {
+  if (value.value != null) {
+    return `${value.value} ${unit.value}`
+  }
+  return null
+})
+
 const isOutOfRange = computed(() => {
   return value.value <= min.value || value.value >= max.value
 })
 
-console.log(`${props.sensorLabel} - ${value.value}`)
-// Get & Format Sensor Data
-const sensorDisplay = computed(() => {
-  const units = {
-    'sensor.temp': '°C',
-    'sensor.humi': '%',
-    'sensor.pressure': 'Pa',
-    'sensor.noise': 'dB',
-  }
-  if (value.value != null) {
-    return `${value.value} ${units[props.sensorKey] || ''}`
-  }
-  return null
-})
-const isError = computed(() => getWsData(props.device.area, props.errorPath))
 const sensorColor = computed(() => isError.value ? '#AC1754' : '#3D8D7A')
-const errorReasons = computed(() => getWsData(props.device.area, props.reasonPath) || [])
+
+// Set timeout to hide component after 30 seconds if sensorDisplay is not available
+const setHideTimeout = () => {
+  // Clear any existing timeout
+  if (hideTimeout) {
+    clearTimeout(hideTimeout)
+  }
+
+  // Set new timeout
+  hideTimeout = setTimeout(() => {
+    if (!sensorDisplay.value || value.value == 0) {
+      showComponent.value = false
+    }
+  }, 5000) // 5 seconds
+}
+
+// Initialize timeout when component is mounted
+onMounted(() => {
+  setHideTimeout()
+})
+
+// Clear timeout when component is unmounted
+onUnmounted(() => {
+  if (hideTimeout) {
+    clearTimeout(hideTimeout)
+  }
+})
 </script>
 
 <style scoped>
