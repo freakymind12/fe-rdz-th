@@ -97,9 +97,11 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
 
     // initial declare ws data
     async initializeWsData() {
-      await deviceStore.getDevice({ status: 1 })
+      await deviceStore.getDevice()
 
-      this.data = deviceStore.devices.map((device) => ({
+      const activeDevices = deviceStore.devices.filter(device => device.status === 1)
+
+      this.data = activeDevices.map((device) => ({
         area: device.area,
         regional: device.regional,
         date: dayjsModified(device.updated_at).format('YYYY-MM-DD HH:mm:ss'),
@@ -141,7 +143,7 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
     },
 
     checkInactiveDevices() {
-      setInterval(() => {
+      setInterval(async () => {
         const now = dayjsModified()
         let needReinit = false
 
@@ -166,6 +168,7 @@ export const useWebSocketStore = defineStore('websocketRdzTh', {
         // Panggil sekali di luar loop ketika diperlukan
         if (needReinit) {
           this.initializeWsData()
+          await deviceStore.getDevice()
           notification.info({
             message: 'Auto Refresh',
             description: 'Refresh device connected',
