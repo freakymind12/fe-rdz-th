@@ -5,13 +5,13 @@
     </a-divider>
     <a-row :gutter="[8, 8]" :wrap="true">
       <!-- Render Groups yang punya index genap -->
-      <a-col :xs="24" :lg="12">
+      <a-col :xs="24" :lg="24" :xl="12">
         <div v-for="group in groupStore.evenGroups" :key="group.group_id" class="mb">
           <GroupCard :group="group" @edit="handleEdit(group)" />
         </div>
       </a-col>
       <!-- Render Groups yang punya index ganjil -->
-      <a-col :xs="24" :lg="12">
+      <a-col :xs="24" :lg="24" :xl="12">
         <div v-for="group in groupStore.oddGroups" :key="group.group_id" class="mb">
           <GroupCard :group="group" @edit="handleEdit(group)" />
         </div>

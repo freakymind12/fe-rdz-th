@@ -51,11 +51,12 @@ export const useDeviceStore = defineStore('device', {
         const response = await api.patch(`/device/change-area`, data)
         if (response.status === 200) {
           message.success('Update area success')
-        } else {
-          console.error('Error while update area', response.status)
+          return true
         }
       } catch (error) {
         console.error(error)
+        message.error(error.response.data.message)
+        return false
       }
     },
 
@@ -64,11 +65,12 @@ export const useDeviceStore = defineStore('device', {
         const response = await api.patch(`/device/change-parameter`, data)
         if (response.status === 200) {
           message.success(`Update parameter for device ${data.area} success`)
-        } else {
-          console.error('Error while update parameter', response.status)
+          return true
         }
       } catch (error) {
         console.error(error)
+        message.error(error.response.data.message)
+        return false
       }
     },
 
@@ -77,11 +79,12 @@ export const useDeviceStore = defineStore('device', {
         const response = await api.patch(`/device/change-group`, data)
         if (response.status === 200) {
           message.success('Update group success')
-        } else {
-          console.error('Error while update group', response.status)
+          return true
         }
       } catch (error) {
         console.error(error)
+        message.error(error.response.data.message)
+        return false
       }
     },
   },
