@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import api from '@/axios/interceptor'
 import { message } from 'ant-design-vue'
+import { useAuthStore } from './auth'
+
 
 export const useDeviceStore = defineStore('device', {
   state: () => ({
@@ -76,7 +78,11 @@ export const useDeviceStore = defineStore('device', {
 
     async updateGroup(data) {
       try {
-        const response = await api.patch(`/device/change-group`, data)
+        const response = await api.patch(`/device/change-group`, data, {
+          headers: {
+            'Authorization': `Bearer ${useAuthStore().token}`
+          }
+        })
         if (response.status === 200) {
           message.success('Update group success')
           return true

@@ -17,8 +17,7 @@
         </div>
       </a-col>
     </a-row>
-
-    <a-result v-if="groupStore.group.length === 0" class="no-device">
+    <a-result v-if="groupStore.group.length === 0">
       <template #title>
         <span>No group data</span>
       </template>
@@ -26,21 +25,33 @@
         <span>Click the floating button on bottom right to add a group device</span>
       </template>
     </a-result>
-
+    <!-- Admin List -->
+    <AdminListCard />
     <!-- Float Button Add Group -->
-    <a-float-button tooltip="Add New Group" type="primary" :style="{
-      right: '24px',
-    }" @click="handleAdd">
+    <a-float-button-group trigger="hover" type="primary" :style="{ right: '24px' }">
       <template #icon>
-        <PlusCircleOutlined />
+        <QuestionOutlined />
       </template>
-    </a-float-button>
+      <a-float-button @click="handleAdd('group')" tooltip="Add New Group">
+        <template #icon>
+          <GroupOutlined />
+        </template>
+      </a-float-button>
+      <a-float-button @click="handleAdd('admin')" tooltip="Add New Admin">
+        <template #icon>
+          <UserAddOutlined />
+        </template>
+      </a-float-button>
+    </a-float-button-group>
 
     <!-- Modal Form Group -->
     <Teleport to="body">
       <BaseModal :visible="modalData.visible" :modal-title="modalData.title" @close="handleClose">
         <template #body>
-          <FormGroup :data="modalData.data" :mode="modalData.mode" @close="handleClose" />
+          <FormGroup v-if="modalData.type === 'group'" :data="modalData.data" :mode="modalData.mode"
+            @close="handleClose" />
+          <FormAdmin v-if="modalData.type === 'admin'" :data="modalData.data" :mode="modalData.mode"
+            @close="handleClose" />
         </template>
       </BaseModal>
     </Teleport>
@@ -50,11 +61,12 @@
 <script setup>
 import { useGroupStore } from '@/stores/group'
 import { useDeviceStore } from '@/stores/device'
-import { PlusCircleOutlined } from '@ant-design/icons-vue'
+import { GroupOutlined, QuestionOutlined, UserAddOutlined } from '@ant-design/icons-vue'
 import GroupCard from './component/GroupCard.vue'
+import AdminListCard from './component/AdminListCard.vue'
 import BaseModal from '@/components/shared/BaseModal.vue'
 import FormGroup from './component/FormGroup.vue'
-
+import FormAdmin from './component/FormAdmin.vue'
 import { onMounted, ref } from 'vue'
 
 const deviceStore = useDeviceStore()
@@ -65,6 +77,7 @@ const modalData = ref({
   mode: null,
   data: null,
   title: '',
+  type: null
 })
 
 const handleEdit = (item) => {
@@ -73,15 +86,17 @@ const handleEdit = (item) => {
     title: 'Edit Group',
     data: item,
     mode: 'edit',
+    type: 'group'
   }
 }
 
-const handleAdd = () => {
+const handleAdd = (type) => {
   modalData.value = {
     visible: !modalData.value.visible,
-    title: 'Add Group',
+    title: type === 'group' ? 'Add Group' : 'Add Admin',
     data: null,
     mode: 'add',
+    type: type
   }
 }
 
@@ -96,10 +111,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.no-device {
-  padding-top: 15%;
-}
-
 .divider-title {
   background-color: #f5f5f5;
   padding-left: 5px;

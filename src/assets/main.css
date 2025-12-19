@@ -45,3 +45,11 @@
 .small {
   font-size: small;
 }
+
+.medium {
+  font-size: medium;
+}
+
+.secondary {
+  color: grey;
+}

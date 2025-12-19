@@ -8,10 +8,10 @@
       <a-switch size="small" v-model:checked="changePassword" />
       <span>Change Password</span>
     </a-space>
-    <a-form-item label="Password" name="password" :rules="passwordRules" v-if="changePassword || mode === 'add'">
+    <a-form-item label="Group Password" name="password" :rules="passwordRules" v-if="changePassword || mode === 'add'">
       <a-input-password v-model:value="formState.password" />
     </a-form-item>
-    <a-form-item label="Retype Password" name="retype_password" :rules="retypeRules"
+    <a-form-item label="Retype Group Password" name="retype_password" :rules="retypeRules"
       v-if="changePassword || mode === 'add'">
       <a-input-password v-model:value="formState.retype_password" />
     </a-form-item>

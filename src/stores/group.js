@@ -46,13 +46,8 @@ export const useGroupStore = defineStore('group', {
       }
     },
 
-    async deleteGroup(id, password) {
+    async deleteGroup(id) {
       try {
-        if (password !== "adminrdzth123") {
-          message.error("Wrong password")
-          return
-        }
-
         const response = await api.delete(`/group/${id}`)
 
         if (response.status === 200) {
